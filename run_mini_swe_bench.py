@@ -110,6 +110,7 @@ def run_provider(
     environment_class = swebench_opts.get("environment_class", "local")
     run_eval = swebench_opts.get("run_eval", True)
     slice_spec = swebench_opts.get("slice", "")
+    bench_config = swebench_opts.get("bench_config", "swebench.yaml")
 
     for alias, model_id in models.items():
         if model_id == "not_available":
@@ -137,9 +138,10 @@ def run_provider(
             "--subset", subset,
             "--split", split,
             "--workers", str(workers),
-            "-c", "swebench.yaml",
+            "-c", bench_config,
             "-c", f"agent.step_limit={effective_step_limit}",
             "-c", f"environment.environment_class={environment_class}",
+            "-c", "model.cost_tracking=ignore_errors",
         ]
 
         if slice_spec:
