@@ -142,7 +142,7 @@ def run_provider(
             "-c", f"agent.step_limit={effective_step_limit}",
             "-c", f"environment.environment_class={environment_class}",
             "-c", "model.cost_tracking=ignore_errors",
-            "-c", "model.model_kwargs.drop_params=false",
+            "-c", 'model.model_kwargs.allowed_openai_params=["tools","parallel_tool_calls"]',
         ]
 
         if slice_spec:
