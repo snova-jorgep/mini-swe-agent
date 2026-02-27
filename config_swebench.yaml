@@ -7,7 +7,7 @@ swebench_options:
   environment_class: docker  # docker (recommended) | local | singularity
   run_eval: false            # set to false to skip sb-cli submit and preserve quota
   slice: "0:3"                  # e.g. "0:3" to run only first 3 instances (saves Docker image disk space)
-  bench_config: swebench_backticks.yaml  # swebench.yaml (tool-calls) | swebench_backticks.yaml (markdown, works with most models)
+  bench_config: swebench.yaml  # swebench.yaml (tool-calls) | swebench_backticks.yaml (markdown, works with most models)
 
 max_parallel: 1    # concurrent provider processes
 

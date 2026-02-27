@@ -142,6 +142,7 @@ def run_provider(
             "-c", f"agent.step_limit={effective_step_limit}",
             "-c", f"environment.environment_class={environment_class}",
             "-c", "model.cost_tracking=ignore_errors",
+            "-c", "model.model_kwargs.drop_params=false",
         ]
 
         if slice_spec:
