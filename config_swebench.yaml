@@ -5,8 +5,8 @@ swebench_options:
   workers: 4            # parallel instances within a single model run
   step_limit: 250       # max bash actions the agent may take per instance
   environment_class: docker  # docker (recommended) | local | singularity
-  run_eval: false            # set to false to skip sb-cli submit and preserve quota
-  slice: "0:3"                  # e.g. "0:3" to run only first 3 instances (saves Docker image disk space)
+  run_eval: true            # set to false to skip sb-cli submit and preserve quota
+  slice: ""                  # e.g. "0:3" to run only first 3 instances (saves Docker image disk space)
   bench_config: swebench.yaml  # swebench.yaml (tool-calls) | swebench_backticks.yaml (markdown, works with most models)
 
 max_parallel: 1    # concurrent provider processes
@@ -38,6 +38,86 @@ provider_model_args:
 
 model_mappings:
   SambaNova:
+
     MiniMax-M2.5: "MiniMax-M2.5"
-  
-  overrides: {}   # per-provider/model step_limit overrides if needed
+  Fireworks:
+    Meta-Llama-3.1-405B-Instruct: "accounts/fireworks/models/llama-v3p1-405b-instruct"
+    Meta-Llama-3.3-70B-Instruct: "accounts/fireworks/models/llama-v3p3-70b-instruct"
+    Llama-4-Scout-17B-16E-Instruct: "accounts/fireworks/models/llama4-scout-instruct-basic"
+    Llama-4-Maverick-17B-128E-Instruct: "accounts/fireworks/models/llama4-maverick-instruct-basic"
+    DeepSeek-V3-0324: "accounts/fireworks/models/deepseek-v3-0324"
+    DeepSeek-V3.1: "accounts/fireworks/models/deepseek-v3p1"
+    DeepSeek-R1-0528: "accounts/fireworks/models/deepseek-r1-0528"
+    Qwen3-32B: "accounts/fireworks/models/qwen3-30b-a3b"
+    gpt-oss-120b: "accounts/fireworks/models/gpt-oss-120b"
+    Meta-Llama-3.1-8B-Instruct: "accounts/fireworks/models/llama-v3p1-8b-instruct"
+    DeepSeek-V3.1-Terminus: "accounts/fireworks/models/deepseek-v3p1-terminus"
+    Qwen3-235B: "fireworks/qwen3-235b-a22b-instruct-2507"
+    DeepSeek-V3.2: "fireworks/deepseek-v3p2"
+    MiniMax-M2.5: "fireworks/minimax-m2p5"
+  Groq:
+    Meta-Llama-3.1-405B-Instruct: "not_available"
+    Meta-Llama-3.3-70B-Instruct: "llama-3.3-70b-versatile"
+    Llama-4-Scout-17B-16E-Instruct: "meta-llama/llama-4-scout-17b-16e-instruct"
+    Llama-4-Maverick-17B-128E-Instruct: "meta-llama/llama-4-maverick-17b-128e-instruct"
+    DeepSeek-V3-0324: "not_available"
+    DeepSeek-V3.1: "not_available"
+    DeepSeek-R1-0528: "not_available"
+    Qwen3-32B: "qwen/qwen3-32b"
+    gpt-oss-120b: "openai/gpt-oss-120b"
+    Meta-Llama-3.1-8B-Instruct: "llama-3.1-8b-instant"
+    DeepSeek-V3.1-Terminus: "not_available"
+    Qwen3-235B: "not_available"
+    DeepSeek-V3.2: "not_available"
+    MiniMax-M2.5: "not_available"
+  Cerebras:
+    Meta-Llama-3.1-405B-Instruct: "not_available"
+    Meta-Llama-3.3-70B-Instruct: "llama-3.3-70b"
+    Llama-4-Scout-17B-16E-Instruct: "llama-4-scout-17b-16e-instruct"
+    Llama-4-Maverick-17B-128E-Instruct: "not_available"
+    DeepSeek-V3-0324: "not_available"
+    DeepSeek-V3.1: "not_available"
+    DeepSeek-R1-0528: "not_available"
+    Qwen3-32B: "qwen-3-32b"
+    gpt-oss-120b: "gpt-oss-120b"
+    Meta-Llama-3.1-8B-Instruct: "llama3.1-8b"
+    DeepSeek-V3.1-Terminus: "not_available"
+    Qwen3-235B: "qwen-3-235b-a22b-instruct-2507"
+    DeepSeek-V3.2: "not_available"
+    MiniMax-M2.5: "not_available"
+  Together:
+    Meta-Llama-3.1-405B-Instruct: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo"
+    Meta-Llama-3.3-70B-Instruct: "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+    Llama-4-Scout-17B-16E-Instruct: "meta-llama/Llama-4-Scout-17B-16E-Instruct"
+    Llama-4-Maverick-17B-128E-Instruct: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8"
+    DeepSeek-V3-0324: "deepseek-ai/DeepSeek-V3"
+    DeepSeek-V3.1: "deepseek-ai/DeepSeek-V3.1"
+    DeepSeek-R1-0528: "deepseek-ai/DeepSeek-R1"
+    Qwen3-32B: "Qwen/Qwen3-32B"
+    gpt-oss-120b: "openai/gpt-oss-120b"
+    Meta-Llama-3.1-8B-Instruct: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+    DeepSeek-V3.1-Terminus: "not_available"
+    Qwen3-235B: "Qwen/Qwen3-235B-A22B-Instruct-2507-tput"
+    DeepSeek-V3.2: "not_available"
+    MiniMax-M2.5: "MiniMaxAI/MiniMax-M2.5"
+  Novita:
+    Meta-Llama-3.1-405B-Instruct: "not_available"
+    Meta-Llama-3.3-70B-Instruct: "meta-llama/llama-3.3-70b-instruct"
+    Llama-4-Scout-17B-16E-Instruct: "meta-llama/llama-4-scout-17b-16e-instruct"
+    Llama-4-Maverick-17B-128E-Instruct: "meta-llama/llama-4-maverick-17b-128e-instruct-fp8"
+    DeepSeek-V3-0324: "deepseek/deepseek-v3-0324"
+    DeepSeek-V3.1: "deepseek/deepseek-v3.1"
+    DeepSeek-R1-0528: "deepseek/deepseek-r1-0528"
+    Qwen3-32B: "qwen/qwen3-32b-fp8"
+    gpt-oss-120b: "openai/gpt-oss-120b"
+    Meta-Llama-3.1-8B-Instruct: "meta-llama/llama-3.1-8b-instruct"
+    DeepSeek-V3.1-Terminus: "deepseek/deepseek-v3.1-terminus"
+    Qwen3-235B: "qwen/qwen3-235b-a22b-instruct-2507"
+    DeepSeek-V3.2: "deepseek/deepseek-v3.2"
+    MiniMax-M2.5: "minimax/minimax-m2.5"
+  Corethink:
+    DeepSeek-V3.1: "DeepSeek-V3.1"
+    DeepSeek-R1-0528: "DeepSeek-R1-0528"
+    MiniMax-M2.5: "MiniMax-M2.5"
+
+overrides: {}   # per-provider/model step_limit overrides if needed
