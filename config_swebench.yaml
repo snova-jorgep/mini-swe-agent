@@ -38,8 +38,20 @@ provider_model_args:
 
 model_mappings:
   SambaNova:
-
-    MiniMax-M2.5: "MiniMax-M2.5"
+    Meta-Llama-3.1-405B-Instruct:      "not_available"
+    Meta-Llama-3.3-70B-Instruct:       "Meta-Llama-3.3-70B-Instruct"
+    Llama-4-Scout-17B-16E-Instruct:    "not_available"
+    Llama-4-Maverick-17B-128E-Instruct: "Llama-4-Maverick-17B-128E-Instruct"
+    DeepSeek-V3-0324:                  "DeepSeek-V3-0324"
+    DeepSeek-V3.1:                     "DeepSeek-V3.1"
+    DeepSeek-R1-0528:                  "DeepSeek-R1-0528"
+    Qwen3-32B:                         "Qwen3-32B"
+    gpt-oss-120b:                      "gpt-oss-120b"
+    Meta-Llama-3.1-8B-Instruct:        "Meta-Llama-3.1-8B-Instruct"
+    DeepSeek-V3.1-Terminus:            "DeepSeek-V3.1-Terminus"
+    Qwen3-235B:                        "Qwen3-235B"
+    DeepSeek-V3.2:                     "DeepSeek-V3.2"
+    MiniMax-M2.5:                      "MiniMax-M2.5"
   Fireworks:
     Meta-Llama-3.1-405B-Instruct: "accounts/fireworks/models/llama-v3p1-405b-instruct"
     Meta-Llama-3.3-70B-Instruct: "accounts/fireworks/models/llama-v3p3-70b-instruct"
