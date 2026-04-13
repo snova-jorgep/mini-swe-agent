@@ -52,6 +52,7 @@ model_mappings:
     Qwen3-235B:                        "Qwen3-235B"
     DeepSeek-V3.2:                     "DeepSeek-V3.2"
     MiniMax-M2.5:                      "MiniMax-M2.5"
+    MiniMax-M2.7:                      "MiniMax-M2.7"
   Fireworks:
     Meta-Llama-3.1-405B-Instruct: "accounts/fireworks/models/llama-v3p1-405b-instruct"
     Meta-Llama-3.3-70B-Instruct: "accounts/fireworks/models/llama-v3p3-70b-instruct"
@@ -67,6 +68,7 @@ model_mappings:
     Qwen3-235B: "fireworks/qwen3-235b-a22b-instruct-2507"
     DeepSeek-V3.2: "fireworks/deepseek-v3p2"
     MiniMax-M2.5: "fireworks/minimax-m2p5"
+    MiniMax-M2.7: "accounts/fireworks/models/minimax-m2p7"
   Groq:
     Meta-Llama-3.1-405B-Instruct: "not_available"
     Meta-Llama-3.3-70B-Instruct: "llama-3.3-70b-versatile"
@@ -82,6 +84,7 @@ model_mappings:
     Qwen3-235B: "not_available"
     DeepSeek-V3.2: "not_available"
     MiniMax-M2.5: "not_available"
+    MiniMax-M2.7: "not_available"
   Cerebras:
     Meta-Llama-3.1-405B-Instruct: "not_available"
     Meta-Llama-3.3-70B-Instruct: "llama-3.3-70b"
@@ -97,6 +100,7 @@ model_mappings:
     Qwen3-235B: "qwen-3-235b-a22b-instruct-2507"
     DeepSeek-V3.2: "not_available"
     MiniMax-M2.5: "not_available"
+    MiniMax-M2.7: "not_available"
   Together:
     Meta-Llama-3.1-405B-Instruct: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo"
     Meta-Llama-3.3-70B-Instruct: "meta-llama/Llama-3.3-70B-Instruct-Turbo"
@@ -112,6 +116,7 @@ model_mappings:
     Qwen3-235B: "Qwen/Qwen3-235B-A22B-Instruct-2507-tput"
     DeepSeek-V3.2: "not_available"
     MiniMax-M2.5: "MiniMaxAI/MiniMax-M2.5"
+    MiniMax-M2.7: "MiniMaxAI/MiniMax-M2.7"
   Novita:
     Meta-Llama-3.1-405B-Instruct: "not_available"
     Meta-Llama-3.3-70B-Instruct: "meta-llama/llama-3.3-70b-instruct"
@@ -127,9 +132,11 @@ model_mappings:
     Qwen3-235B: "qwen/qwen3-235b-a22b-instruct-2507"
     DeepSeek-V3.2: "deepseek/deepseek-v3.2"
     MiniMax-M2.5: "minimax/minimax-m2.5"
+    MiniMax-M2.7: "minimax/minimax-m2.7"
   Corethink:
     DeepSeek-V3.1: "DeepSeek-V3.1"
     DeepSeek-R1-0528: "DeepSeek-R1-0528"
     MiniMax-M2.5: "MiniMax-M2.5"
+    MiniMax-M2.7: "MiniMax-M2.7"
 
 overrides: {}   # per-provider/model step_limit overrides if needed
