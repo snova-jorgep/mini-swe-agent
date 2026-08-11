@@ -8,6 +8,17 @@ from pathlib import Path
 import boto3
 from dotenv import load_dotenv
 
+# <repo-root> for config_env, so this works when run from another directory.
+sys.path.append(str(Path(__file__).resolve().parent))
+
+from config_env import (  # noqa: E402
+    config_env_from_argv,
+    internal_providers_from,
+    read_sidecar,
+    resolve_config_env,
+    row_config_env,
+)
+
 
 def _load_env():
     env_file = Path(__file__).resolve().parent / ".env"
@@ -55,9 +66,18 @@ def _upload_to_s3(local_path: Path, s3_prefix: str):
         print(f"[WARN] Upload failed for {local_path}: {e}")
 
 
-def generate_report(logs_dir: str, s3_prefix: str | None = None):
+def generate_report(logs_dir: str, s3_prefix: str | None = None, config_env: str | None = None):
     """Walk logs_dir/{provider}/{model}/, collect eval results, write CSV, upload to S3."""
     logs_path = Path(logs_dir)
+
+    # Invoked standalone against an existing run dir there is no flag, so fall back to
+    # the sidecar written at generation time, then to the registry default.
+    if config_env is None:
+        config_env = read_sidecar(logs_path)
+    config_env = resolve_config_env(config_env, None)
+    internal_providers = internal_providers_from(None)
+    print(f"[REPORT] config_env: {config_env}")
+
     rows = []
 
     for provider_dir in sorted(logs_path.iterdir()):
@@ -90,6 +110,8 @@ def generate_report(logs_dir: str, s3_prefix: str | None = None):
                 "resolved": eval_results["resolved"] if eval_results else None,
                 "total": eval_results["total"] if eval_results else None,
                 "resolution_rate": eval_results["resolution_rate"] if eval_results else None,
+                # Must stay LAST: the Athena regex expects config_env trailing.
+                "config_env": row_config_env(config_env, provider, internal_providers),
             }
             rows.append(row)
             status = (
@@ -105,7 +127,7 @@ def generate_report(logs_dir: str, s3_prefix: str | None = None):
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     csv_path = logs_path / f"results_{timestamp}.csv"
-    fieldnames = ["date", "provider", "model", "subset", "split", "resolved", "total", "resolution_rate"]
+    fieldnames = ["date", "provider", "model", "subset", "split", "resolved", "total", "resolution_rate", "config_env"]
 
     with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=";")
@@ -121,10 +143,11 @@ def generate_report(logs_dir: str, s3_prefix: str | None = None):
 
 
 if __name__ == "__main__":
+    cli_config_env = config_env_from_argv()
     if len(sys.argv) < 2:
-        print("Usage: mini_swe_bench_report.py <logs_dir> [s3_prefix]")
+        print("Usage: mini_swe_bench_report.py <logs_dir> [s3_prefix] [--config-env <id>]")
         sys.exit(1)
 
     _load_env()
     s3_prefix = sys.argv[2] if len(sys.argv) > 2 else None
-    generate_report(sys.argv[1], s3_prefix)
+    generate_report(sys.argv[1], s3_prefix, config_env=cli_config_env)

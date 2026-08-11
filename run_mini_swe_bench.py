@@ -8,6 +8,14 @@ from datetime import datetime
 import yaml
 from dotenv import load_dotenv
 
+# <repo-root> for config_env, so this works when run from another directory.
+sys.path.append(str(Path(__file__).resolve().parent))
+
+from config_env import (  # noqa: E402
+    config_env_from_argv,
+    resolve_config_env,
+    write_sidecar,
+)
 from mini_swe_bench_report import generate_report
 
 
@@ -210,6 +218,7 @@ def run_provider(
 
 
 def main():
+    cli_config_env = config_env_from_argv()
     dry_run = "--dry-run" in sys.argv
     if dry_run:
         sys.argv = [arg for arg in sys.argv if arg != "--dry-run"]
@@ -227,11 +236,20 @@ def main():
     model_mappings = cfg.get("model_mappings", {})
     overrides = cfg.get("overrides", {})
 
+    config_env = resolve_config_env(cli_config_env, cfg)
+    print(f"[INFO] config_env: {config_env}")
+
     run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_base = current_dir / "logs" / BENCH_GROUP_NAME / run_timestamp
     output_base.mkdir(parents=True, exist_ok=True)
 
     s3_prefix = f"fc-so-testing-suite/mini_swe_snova/{run_timestamp}"
+
+    # Written BEFORE any work: this is a two-stage flow (generate, then sb-cli
+    # submit), so if it dies partway the report can still be run by hand later and
+    # recover the right config_env.
+    if not dry_run:
+        write_sidecar(output_base, config_env, base_urls)
 
     print(f"[INFO] Output will be saved locally in: {output_base}")
     print(f"[INFO] Results will be uploaded to: s3://{os.getenv('AWS_S3_BUCKET_NAME')}/{s3_prefix}\n")
@@ -264,7 +282,7 @@ def main():
             pool.starmap(run_provider, tasks)
 
     if not dry_run:
-        generate_report(str(output_base), s3_prefix)
+        generate_report(str(output_base), s3_prefix, config_env=config_env)
 
     print(f"\n[COMPLETE] All benchmarks finished.")
     print(f"Local output: {output_base}")
