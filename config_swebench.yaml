@@ -60,6 +60,7 @@ model_mappings:
     MiniMax-M2.5:                      "MiniMax-M2.5"
     MiniMax-M2.7:                      "MiniMax-M2.7"
     MiniMax-M3:                        "MiniMax-M3"
+    GLM-5.2:                           "GLM-5.2"
     Gemma-4-31B: "gemma-4-31B-it"
   Fireworks:
     Meta-Llama-3.1-405B-Instruct: "accounts/fireworks/models/llama-v3p1-405b-instruct"
@@ -78,6 +79,7 @@ model_mappings:
     MiniMax-M2.5: "fireworks/minimax-m2p5"
     MiniMax-M2.7: "accounts/fireworks/models/minimax-m2p7"
     MiniMax-M3:   "accounts/fireworks/models/minimax-m3"
+    GLM-5.2:      "accounts/fireworks/models/glm-5p2"
     Gemma-4-31B: "accounts/fireworks/models/gemma-4-31b-it"
   Groq:
     Meta-Llama-3.1-405B-Instruct: "not_available"
@@ -96,6 +98,7 @@ model_mappings:
     MiniMax-M2.5: "not_available"
     MiniMax-M2.7: "not_available"
     MiniMax-M3:   "not_available"
+    GLM-5.2:      "not_available"
     Gemma-4-31B: "not_available"
   Cerebras:
     Meta-Llama-3.1-405B-Instruct: "not_available"
@@ -114,6 +117,7 @@ model_mappings:
     MiniMax-M2.5: "not_available"
     MiniMax-M2.7: "not_available"
     MiniMax-M3:   "not_available"
+    GLM-5.2:      "not_available"
     Gemma-4-31B: "not_available"
   Together:
     Meta-Llama-3.1-405B-Instruct: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo"
@@ -132,6 +136,7 @@ model_mappings:
     MiniMax-M2.5: "MiniMaxAI/MiniMax-M2.5"
     MiniMax-M2.7: "MiniMaxAI/MiniMax-M2.7"
     MiniMax-M3:   "MiniMaxAI/MiniMax-M3"
+    GLM-5.2:      "zai-org/GLM-5.2"
     Gemma-4-31B: "google/gemma-4-31B-it"
   Novita:
     Meta-Llama-3.1-405B-Instruct: "not_available"
@@ -150,6 +155,7 @@ model_mappings:
     MiniMax-M2.5: "minimax/minimax-m2.5"
     MiniMax-M2.7: "minimax/minimax-m2.7"
     MiniMax-M3:   "minimax/minimax-m3"
+    GLM-5.2:      "zai-org/glm-5.2"
     Gemma-4-31B: "google/gemma-4-31b-it"
   Corethink:
     DeepSeek-V3.1: "DeepSeek-V3.1"
