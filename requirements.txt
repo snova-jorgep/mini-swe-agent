@@ -1,4 +1,5 @@
 boto3
 python-dotenv
 pyyaml
-sb-cli    
+sb-cli
+swebench==4.1.0  # local eval_backend; 5.x needs an "image" field the Lite/Verified datasets lack

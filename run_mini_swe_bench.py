@@ -1,4 +1,6 @@
+import json
 import os
+import shutil
 import subprocess
 import multiprocessing
 import sys
@@ -21,6 +23,13 @@ from mini_swe_bench_report import generate_report
 
 CONFIG_FILENAME = "config_swebench.yaml"
 BENCH_GROUP_NAME = "mini_swe"
+
+# Same datasets mini-swe-agent generates against (see src/minisweagent/run/benchmarks/swebench.py).
+SWEBENCH_DATASETS = {
+    "lite": "princeton-nlp/SWE-bench_Lite",
+    "verified": "princeton-nlp/SWE-bench_Verified",
+    "full": "princeton-nlp/SWE-bench",
+}
 
 current_dir = Path(__file__).resolve().parent
 sys.path.append(str(current_dir))
@@ -92,6 +101,63 @@ def _upload_file(local_path: Path, s3_prefix: str):
         print(f"[WARN] Upload failed for {local_path}: {e}")
 
 
+def build_eval_cmd(swebench_opts: dict, preds_path: Path, model_dir: Path, run_id: str) -> list:
+    """Build the evaluation command for the configured eval_backend (local | cloud)."""
+    subset = swebench_opts.get("subset", "lite")
+    split = swebench_opts.get("split", "dev")
+    backend = swebench_opts.get("eval_backend", "cloud")
+
+    if backend == "local":
+        return [
+            sys.executable, "-m", "swebench.harness.run_evaluation",
+            "--dataset_name", SWEBENCH_DATASETS[subset],
+            "--split", split,
+            "--predictions_path", str(preds_path.resolve()),
+            "--max_workers", str(swebench_opts.get("eval_max_workers", 3)),
+            "--run_id", run_id,
+        ]
+    if backend == "cloud":
+        return [
+            "sb-cli", "submit",
+            f"swe-bench_{subset}", split,
+            "--predictions_path", str(preds_path),
+            "--output_dir", str(model_dir),
+            "--run_id", run_id,
+        ]
+    raise ValueError(f"Unknown eval_backend: {backend!r} (expected local | cloud)")
+
+
+def evaluate_predictions(swebench_opts: dict, preds_path: Path, model_dir: Path, run_id: str) -> Path | None:
+    """Evaluate preds_path and return the report, named like sb-cli's so the report script reads either."""
+    subset = swebench_opts.get("subset", "lite")
+    split = swebench_opts.get("split", "dev")
+    backend = swebench_opts.get("eval_backend", "cloud")
+    report_path = model_dir / f"swe-bench_{subset}__{split}__{run_id}.json"
+    eval_cmd = build_eval_cmd(swebench_opts, preds_path, model_dir, run_id)
+
+    if backend == "cloud":
+        run_command(eval_cmd, model_dir / "eval.log", dry_run=False)
+        return report_path if report_path.exists() else None
+
+    # The local harness writes its report and logs/run_evaluation/ into the cwd.
+    print(f"[RUNNING] (cwd={model_dir}) {' '.join(eval_cmd)}")
+    with open(model_dir / "eval.log", "w") as lf:
+        result = subprocess.run(eval_cmd, cwd=model_dir, stdout=lf, stderr=subprocess.STDOUT, check=False)
+    if result.returncode != 0:
+        print(f"[FAIL] local eval exit code {result.returncode}, see {model_dir / 'eval.log'}")
+
+    with open(preds_path) as f:
+        preds = json.load(f)
+    model_name = next(iter(preds.values()))["model_name_or_path"]
+    harness_report = model_dir / f"{model_name.replace('/', '__')}.{run_id}.json"
+    if not harness_report.exists():
+        print(f"[WARN] local eval produced no report ({harness_report.name})")
+        return None
+    shutil.copyfile(harness_report, report_path)
+    print(f"[DONE] local eval report: {report_path}")
+    return report_path
+
+
 def run_provider(
     provider: str,
     models: dict,
@@ -129,7 +195,7 @@ def run_provider(
         model_dir.mkdir(parents=True, exist_ok=True)
         log_file = model_dir / "run.log"
         preds_path = model_dir / "preds.json"
-        eval_path = model_dir / "eval_results.json"
+        eval_report = None
 
         model_str = f"{litellm_prefix}/{model_id}"
 
@@ -190,19 +256,16 @@ def run_provider(
         else:
             run_command(gen_cmd, log_file, dry_run=False)
 
-        # --- Evaluation command (skipped when run_eval=false to preserve sb-cli quota) ---
+        # --- Evaluation (skipped when run_eval=false to preserve sb-cli quota) ---
+        # run_id must be unique per run: sb-cli never re-evaluates predictions already
+        # submitted under an id, and a bare alias collides across providers and reruns.
+        eval_run_id = f"{provider}__{alias}__{output_base.name}"
         if run_eval:
-            eval_cmd = [
-                "sb-cli", "submit",
-                f"swe-bench_{subset}", split,
-                "--predictions_path", str(preds_path),
-                "--output_dir", str(model_dir),
-            ]
-
             if dry_run:
+                eval_cmd = build_eval_cmd(swebench_opts, preds_path, model_dir, eval_run_id)
                 print(f"[DRY-RUN] {provider}/{alias} eval: {' '.join(eval_cmd)}")
             else:
-                run_command(eval_cmd, model_dir / "eval.log", dry_run=False)
+                eval_report = evaluate_predictions(swebench_opts, preds_path, model_dir, eval_run_id)
         else:
             if dry_run:
                 print(f"[DRY-RUN] {provider}/{alias} eval: skipped (run_eval=false)")
@@ -212,8 +275,9 @@ def run_provider(
         # --- Upload artifacts to S3 ---
         if not dry_run:
             model_s3 = f"{s3_prefix}/{provider}/{alias}"
-            for artifact in [preds_path, eval_path, log_file]:
-                if artifact.exists():
+            # eval_report is the swe-bench_{subset}__{split}__{run_id}.json report from either backend.
+            for artifact in [preds_path, eval_report, log_file, model_dir / "eval.log"]:
+                if artifact and artifact.exists():
                     _upload_file(artifact, model_s3)
 
 
