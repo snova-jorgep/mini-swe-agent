@@ -11,7 +11,17 @@ swebench_options:
   workers: 4            # parallel instances within a single model run
   step_limit: 250       # max bash actions the agent may take per instance
   environment_class: docker  # docker (recommended) | local | singularity
-  run_eval: true            # set to false to skip sb-cli submit and preserve quota
+  run_eval: true            # set to false to skip evaluation entirely
+  eval_backend: local       # local | cloud
+                            #   local = SWE-bench harness on this machine (needs docker).
+                            #           No quota, no run_id immutability, reuses the
+                            #           instance images already pulled by generation.
+                            #           Requires swebench==4.1.0 (5.x expects an "image"
+                            #           field the classic Lite/Verified datasets lack).
+                            #   cloud = sb-cli submit to api.swebench.com. Quota-limited,
+                            #           and predictions are immutable per (run_id, subset,
+                            #           split) so an id can never be reused.
+  eval_max_workers: 3       # local backend only; SWE-bench advises <= 75% of CPU cores
   slice: ""                  # e.g. "0:3" to run only first 3 instances (saves Docker image disk space)
   bench_config: swebench.yaml  # swebench.yaml (tool-calls) | swebench_backticks.yaml (markdown, works with most models)
 
@@ -43,6 +53,8 @@ provider_model_args:
     api_key: "$CORETHINK_API_KEY"
 
 model_mappings:
+  # Scoped to MiniMax-M3 only (branch: rodrigom/minimax_m3_tests).
+  # Full mappings preserved in config_swebench.yaml.bak-*.
   SambaNova:
     Meta-Llama-3.1-405B-Instruct:      "not_available"
     Meta-Llama-3.3-70B-Instruct:       "Meta-Llama-3.3-70B-Instruct"
@@ -177,3 +189,4 @@ model_mappings:
     Gemma-4-31B: "not_available"
 
 overrides: {}   # per-provider/model step_limit overrides if needed
+
